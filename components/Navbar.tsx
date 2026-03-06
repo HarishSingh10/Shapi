@@ -22,28 +22,28 @@ export function Navbar() {
 
     return (
         <nav className={cn(
-            "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b",
-            scrolled ? "glass border-gold/20 py-3" : "bg-transparent border-transparent py-6"
+            "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+            scrolled ? "bg-black/95 backdrop-blur-md shadow-lg py-3" : "bg-black/80 backdrop-blur-sm py-4"
         )}>
             <div className="container-custom mx-auto flex items-center justify-between">
                 {/* Logo */}
-                <Link href="/" className="relative w-16 h-16 md:w-20 md:h-20 transition-transform hover:scale-105">
+                <Link href="/" className="relative w-12 h-12 md:w-16 md:h-16 transition-transform hover:scale-105">
                     <Image
                         src="/logo.png"
                         alt="Sapi's Crafterina Logo"
                         fill
-                        className="object-contain rounded-full border-2 border-gold/20"
+                        className="object-contain"
                         priority
                     />
                 </Link>
 
                 {/* Desktop Nav */}
-                <div className="hidden md:flex items-center space-x-12">
-                    {['Home', 'Shop All', 'Home Lifestyle', 'Automotive', 'About Us'].map((item) => (
+                <div className="hidden md:flex items-center space-x-8">
+                    {['Home', 'All products', 'Automotive', 'Contact'].map((item) => (
                         <Link
                             key={item}
-                            href={item === 'Shop' ? '#collections' : '#'}
-                            className="text-xs font-bold text-gray-300 hover:text-gold transition-colors uppercase tracking-widest relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-0 after:h-[1px] after:bg-gold after:transition-all hover:after:w-full"
+                            href={item === 'All products' ? '#collections' : '#'}
+                            className="text-xs font-semibold text-gray-300 hover:text-[#D4AF37] transition-colors uppercase tracking-wider"
                         >
                             {item}
                         </Link>
@@ -51,16 +51,18 @@ export function Navbar() {
                 </div>
 
                 {/* Icons */}
-                <div className="flex items-center space-x-4">
-                    <Button variant="ghost" size="sm" className="hidden sm:flex hover:text-gold">
+                <div className="flex items-center space-x-3">
+                    <Button variant="ghost" size="sm" className="hidden sm:flex hover:text-[#D4AF37] text-white">
                         <Search className="w-5 h-5" />
                     </Button>
-                    <Button variant="ghost" size="sm" className="relative hover:text-gold">
+                    <Button variant="ghost" size="sm" className="hover:text-[#D4AF37] text-white">
+                        <User className="w-5 h-5" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="relative hover:text-[#D4AF37] text-white">
                         <ShoppingCart className="w-5 h-5" />
-                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-gold text-black text-[9px] font-bold rounded-full flex items-center justify-center">2</span>
                     </Button>
                     <button className="md:hidden text-white" onClick={() => setIsOpen(!isOpen)}>
-                        {isOpen ? <X className="text-gold" /> : <Menu />}
+                        {isOpen ? <X className="text-[#D4AF37]" /> : <Menu />}
                     </button>
                 </div>
             </div>
@@ -70,14 +72,14 @@ export function Navbar() {
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="md:hidden absolute top-full left-0 right-0 bg-black border-b border-gold/20 p-6 shadow-2xl"
+                    className="md:hidden absolute top-full left-0 right-0 bg-black/95 backdrop-blur-md border-t border-gray-800 p-6 shadow-2xl"
                 >
                     <div className="flex flex-col space-y-6">
-                        {['Home', 'Shop All', 'Automotive Care', 'Home Care', 'About Us'].map((item) => (
+                        {['Home', 'All products', 'Automotive', 'Contact'].map((item) => (
                             <Link
                                 key={item}
                                 href="#"
-                                className="text-lg font-medium text-white hover:text-gold transition-colors uppercase tracking-wider"
+                                className="text-base font-medium text-white hover:text-[#D4AF37] transition-colors uppercase tracking-wider"
                                 onClick={() => setIsOpen(false)}
                             >
                                 {item}

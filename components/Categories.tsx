@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 const collections = [
     {
         title: "Self Defense",
-        image: "https://images.unsplash.com/photo-1596460107930-cbdf894c256d?q=80&w=2070&auto=format&fit=crop", // Updated to a safety/defense related image
+        image: "/self_defense_placeholder.png", // Updated to a reliable local placeholder
         link: "#",
         tag: "ESSENTIAL TOOLS FOR SAFETY",
         count: "12+ Products"
@@ -36,64 +36,56 @@ const collections = [
 
 export function Categories() {
     return (
-        <section id="collections" className="py-32 bg-zinc-950 border-t border-white/5 relative">
-            <div className="container-custom mx-auto">
-                <div className="flex flex-col md:flex-row items-end justify-between mb-24">
-                    <div>
-                        <span className="text-gold uppercase tracking-[0.2em] text-sm font-bold block mb-6">Our Expertise</span>
-                        <h2 className="text-4xl md:text-6xl font-bold text-white leading-none">CURATED <br /><span className="text-zinc-500">CATEGORIES</span></h2>
-                    </div>
-                    <div className="hidden md:block max-w-sm text-right">
-                        <p className="text-zinc-400 leading-relaxed border-r-2 border-gold pr-6">
-                            Discover our specialized collections designed to elevate every aspect of your daily life.
-                        </p>
-                    </div>
+        <section id="collections" className="py-20 relative overflow-hidden bg-black">
+            {/* Glassmorphism Effects */}
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-900/50 via-black to-gray-900/50"></div>
+
+            {/* Animated Glass Orbs */}
+            <div className="absolute top-20 right-20 w-[500px] h-[500px] bg-[#D4AF37]/10 rounded-full blur-[120px] animate-float"></div>
+            <div className="absolute bottom-20 left-20 w-[400px] h-[400px] bg-white/5 rounded-full blur-[100px] animate-float-delayed"></div>
+            <div className="absolute top-1/2 left-1/2 w-[350px] h-[350px] bg-[#F4CF57]/8 rounded-full blur-[130px] animate-pulse-slow"></div>
+
+            {/* Glossy Shine Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent"></div>
+
+            {/* Subtle Grid Pattern */}
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjAyIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
+
+            <div className="container-custom mx-auto px-6 relative z-10">
+                <div className="mb-12">
+                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-2 uppercase tracking-tight drop-shadow-2xl">COLLECTIONS</h2>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {collections.map((collection, index) => (
-                        <Link key={index} href={collection.link} className="group relative block h-[450px] rounded-2xl overflow-hidden hover:-translate-y-2 transition-transform duration-500">
+                        <Link key={index} href={collection.link} className="group relative block rounded-3xl overflow-hidden hover:-translate-y-2 transition-all duration-500 shadow-lg hover:shadow-2xl">
                             <motion.div
-                                initial={{ opacity: 0 }}
-                                whileInView={{ opacity: 1 }}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ delay: index * 0.1 }}
-                                className="w-full h-full relative"
+                                transition={{ delay: index * 0.1, duration: 0.5 }}
+                                className="w-full aspect-[3/4] relative bg-gradient-to-br from-gray-900 to-black"
                             >
                                 <img
                                     src={collection.image}
                                     alt={collection.title}
-                                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 brightness-[0.7] group-hover:brightness-[0.8]"
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 brightness-[0.75] group-hover:brightness-[0.9]"
                                 />
 
                                 {/* Gradient Overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/90 opacity-90" />
-
-                                {/* Corner Borders */}
-                                <div className="absolute top-6 right-6 w-8 h-8 border-t border-r border-gold/70 group-hover:w-10 group-hover:h-10 transition-all duration-500" />
-                                <div className="absolute bottom-6 left-6 w-8 h-8 border-b border-l border-gold/70 group-hover:w-10 group-hover:h-10 transition-all duration-500" />
+                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/90" />
 
                                 {/* Content */}
-                                <div className="absolute inset-0 p-8 flex flex-col justify-end items-start z-10">
-                                    {/* Floating Tag */}
-                                    <div className="absolute top-24 left-0 bg-[#3a2d1d]/90 backdrop-blur-md border-r border-t border-b border-gold/40 py-2 px-6 rounded-r-full transform -translate-x-4 group-hover:translate-x-0 transition-transform duration-500">
-                                        <span className="text-[#deb887] text-[10px] font-bold uppercase tracking-widest">
-                                            {collection.tag}
-                                        </span>
-                                    </div>
-
-                                    <h3 className="text-3xl font-serif text-[#f0e6d2] mb-2 drop-shadow-lg group-hover:text-gold transition-colors duration-300">
-                                        {collection.title}
-                                    </h3>
-
-                                    <p className="text-zinc-400 text-sm font-medium tracking-wide mb-6 group-hover:text-white transition-colors duration-300">
-                                        {collection.count}
-                                    </p>
-
-                                    <div className="flex items-center gap-2 text-gold text-xs font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                                        Shop Now <span>→</span>
+                                <div className="absolute bottom-0 left-0 right-0 p-6">
+                                    <div className="bg-gradient-to-r from-[#D4AF37] to-[#F4CF57] p-4 rounded-xl transform group-hover:scale-105 transition-transform duration-300 shadow-lg">
+                                        <h3 className="text-base md:text-lg font-bold text-black uppercase tracking-wide text-center">
+                                            {collection.title}
+                                        </h3>
                                     </div>
                                 </div>
+
+                                {/* Hover Effect Border */}
+                                <div className="absolute inset-0 border-4 border-transparent group-hover:border-[#D4AF37] rounded-3xl transition-all duration-300"></div>
                             </motion.div>
                         </Link>
                     ))}

@@ -2,6 +2,8 @@
 
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, Star } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
 
 const products = [
     {
@@ -15,7 +17,7 @@ const products = [
         name: "Gazotronics 120W Car Charger",
         price: "₹1,299",
         category: "Automotive",
-        image: "https://images.unsplash.com/photo-1592652426689-5eefd5236f81?q=80&w=2070&auto=format&fit=crop",
+        image: "/gazotronics_charger.png",
         tag: "Trending"
     },
     {
@@ -42,87 +44,94 @@ const products = [
         name: "Safety Self Defence Spray",
         price: "₹499",
         category: "Women Safety",
-        image: "https://images.unsplash.com/photo-1596460107930-cbdf894c256d?q=80&w=2070&auto=format&fit=crop",
+        image: "/self_defense_placeholder.png",
         tag: "Must Have"
     }
 ];
 
+// Individual Card Component to handle independent state
+function ProductCard({ product, index }: { product: any, index: number }) {
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+
+    function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
+        const { left, top } = currentTarget.getBoundingClientRect();
+        mouseX.set(clientX - left);
+        mouseY.set(clientY - top);
+    }
+
+    return (
+        <div className="group relative bg-gradient-to-br from-gray-900 to-black rounded-2xl overflow-hidden flex flex-col w-full h-full hover:-translate-y-2 transition-all duration-500 shadow-xl hover:shadow-2xl border border-gray-800">
+            {/* Image Container */}
+            <div className="relative aspect-square overflow-hidden z-0 bg-black">
+                {product.tag && (
+                    <div className="absolute top-3 left-3 z-20 bg-gradient-to-r from-[#D4AF37] to-[#F4CF57] text-black text-[10px] font-bold px-3 py-1.5 uppercase tracking-wider rounded-lg shadow-lg">
+                        {product.tag}
+                    </div>
+                )}
+
+                <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700 ease-out brightness-90 group-hover:brightness-100"
+                />
+
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"></div>
+            </div>
+
+            {/* Product Info */}
+            <div className="p-5 flex flex-col flex-grow bg-gradient-to-br from-gray-900 to-black relative z-20">
+                <h3 className="text-sm md:text-base font-bold text-white mb-3 leading-tight uppercase tracking-wide line-clamp-2 min-h-[2.5rem] group-hover:text-[#D4AF37] transition-colors">
+                    {product.name}
+                </h3>
+
+                <div className="mt-auto pt-4 border-t border-gray-800 flex items-center justify-between">
+                    <span className="text-xl md:text-2xl font-bold text-[#D4AF37]">{product.price}</span>
+                    <button className="bg-gradient-to-r from-[#D4AF37] to-[#F4CF57] text-black px-4 md:px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:shadow-lg hover:scale-105 transition-all duration-300">
+                        Add cart
+                    </button>
+                </div>
+            </div>
+        </div>
+    )
+}
+
 export function FeaturedProducts() {
     return (
-        <section className="py-32 bg-zinc-950 relative">
-            <div className="container-custom mx-auto">
-                <div className="flex flex-col md:flex-row items-end justify-between mb-16 pb-8 border-b border-white/10">
-                    <div>
-                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 uppercase tracking-wide">
-                            Selected <span className="text-gold">Essentials</span>
-                        </h2>
-                        <div className="flex gap-4">
-                            <button className="text-gold border-b border-gold pb-1 text-sm uppercase tracking-widest font-bold">All</button>
-                            <button className="text-gray-500 hover:text-white text-sm uppercase tracking-widest transition-colors">Home</button>
-                            <button className="text-gray-500 hover:text-white text-sm uppercase tracking-widest transition-colors">Automotive</button>
-                        </div>
-                    </div>
-                    <Button variant="outline" className="hidden md:flex border-white/20 hover:border-gold hover:text-gold uppercase tracking-wider text-xs h-12 px-8">
-                        View All Collection
-                    </Button>
+        <section className="py-20 relative overflow-hidden bg-black">
+            {/* Glassmorphism Effects */}
+            <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900/50 to-black"></div>
+
+            {/* Animated Glass Orbs */}
+            <div className="absolute top-32 left-32 w-[550px] h-[550px] bg-[#D4AF37]/12 rounded-full blur-[130px] animate-float"></div>
+            <div className="absolute bottom-32 right-32 w-[450px] h-[450px] bg-white/6 rounded-full blur-[110px] animate-float-delayed"></div>
+            <div className="absolute top-1/3 right-1/4 w-[380px] h-[380px] bg-[#F4CF57]/10 rounded-full blur-[140px] animate-pulse-slow"></div>
+
+            {/* Glossy Shine Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-bl from-transparent via-white/5 to-transparent"></div>
+
+            {/* Subtle Grid Pattern */}
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjAyIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
+
+            <div className="container-custom mx-auto px-6 relative z-10">
+                <div className="mb-12">
+                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-2 uppercase tracking-tight drop-shadow-2xl">
+                        FEATURED PRODUCTS
+                    </h2>
+                    <p className="text-gray-400 text-sm md:text-base mt-2">Discover our premium selection of automotive and lifestyle products</p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {products.map((product, index) => (
-                        <div key={index} className="group relative bg-[#0a0a0a] border border-[#222] hover:border-gold/30 transition-all duration-300 rounded-[2rem] overflow-hidden hover:shadow-2xl flex flex-col max-w-sm mx-auto w-full">
-
-                            {/* Image Container - Compact Aspect Ratio */}
-                            <div className="relative aspect-[4/3] overflow-hidden bg-black">
-                                {product.tag && (
-                                    <div className="absolute top-4 left-4 z-20 bg-[#deb887] text-black text-[10px] font-bold px-3 py-1 uppercase tracking-wider rounded-lg shadow-md">
-                                        {product.tag}
-                                    </div>
-                                )}
-
-                                <img
-                                    src={product.image}
-                                    alt={product.name}
-                                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 ease-out"
-                                />
-
-                                {/* Innovative Quick Add Overlay */}
-                                <div className="absolute inset-x-8 bottom-6 z-20 translate-y-[150%] group-hover:translate-y-0 transition-transform duration-500 ease-out">
-                                    <button className="w-full bg-black/90 backdrop-blur-md text-white border border-white/10 hover:border-gold/50 rounded-full py-3 px-6 flex items-center justify-between group/btn shadow-xl hover:bg-black">
-                                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] group-hover/btn:text-gold transition-colors">Quick Add</span>
-                                        <div className="bg-[#deb887] rounded-full p-1.5 text-black group-hover/btn:scale-110 transition-transform">
-                                            <ShoppingCart className="w-3 h-3" />
-                                        </div>
-                                    </button>
-                                </div>
-
-                                {/* Dark Gradient Overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
-                            </div>
-
-                            {/* Product Info - Compact & Classy */}
-                            <div className="p-5 flex flex-col flex-grow bg-[#0a0a0a] relative z-10">
-                                <div className="flex justify-between items-center mb-3">
-                                    <span className="text-[9px] text-zinc-500 uppercase tracking-[0.2em] border border-zinc-800 px-2 py-1 rounded-full">{product.category}</span>
-                                    <div className="flex gap-0.5">
-                                        {[1, 2, 3, 4, 5].map(i => (
-                                            <Star key={i} className="w-2.5 h-2.5 fill-[#deb887] text-[#deb887]" />
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <h3 className="text-lg font-bold text-white mb-1 leading-tight uppercase tracking-wide group-hover:text-[#deb887] transition-colors line-clamp-2 min-h-[3rem]">
-                                    {product.name}
-                                </h3>
-
-                                <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between">
-                                    <span className="text-xl font-bold text-white font-mono">{product.price}</span>
-                                    <button className="text-[10px] font-bold text-zinc-500 hover:text-white uppercase tracking-[0.2em] transition-colors">
-                                        View Details
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        <ProductCard key={index} product={product} index={index} />
                     ))}
+                </div>
+
+                <div className="text-center mt-16">
+                    <button className="bg-gradient-to-r from-[#D4AF37] to-[#F4CF57] text-black px-10 py-4 rounded-xl text-sm font-bold uppercase tracking-wider hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                        View All Products
+                    </button>
                 </div>
             </div>
         </section>

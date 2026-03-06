@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Oswald, Montserrat } from "next/font/google";
+import { Oswald, Montserrat, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 const oswald = Oswald({
@@ -10,6 +10,11 @@ const oswald = Oswald({
 const montserrat = Montserrat({
   subsets: ["latin"],
   variable: "--font-montserrat",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
 });
 
 export const metadata: Metadata = {
@@ -25,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${oswald.variable} ${montserrat.variable} antialiased bg-black text-white`}
+        className={`${oswald.variable} ${montserrat.variable} ${playfair.variable} antialiased bg-black text-white`}
       >
         {children}
       </body>
