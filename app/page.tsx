@@ -3,6 +3,7 @@ import { Hero } from "@/components/Hero";
 import { Categories } from "@/components/Categories";
 import { FeaturedProducts } from "@/components/FeaturedProducts";
 import { Footer } from "@/components/Footer";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 export default function Home() {
   return (
@@ -12,7 +13,7 @@ export default function Home() {
       <Categories />
       <FeaturedProducts />
 
-      {/* Newsletter / CTA Section - Enhanced Design */}
+      {/* Newsletter / CTA Section */}
       <section className="py-32 relative overflow-hidden bg-black">
         {/* Glassmorphism Effects */}
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900/40 via-black to-gray-900/40"></div>
@@ -33,8 +34,8 @@ export default function Home() {
             </span>
 
             {/* Heading */}
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white drop-shadow-2xl uppercase tracking-tight">
-              JOIN THE <span className="text-[#D4AF37]">INNER CIRCLE</span>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white drop-shadow-2xl tracking-tight">
+              Join the <span className="text-[#D4AF37]">Inner Circle</span>
             </h2>
 
             {/* Description */}
@@ -58,6 +59,7 @@ export default function Home() {
       </section>
 
       <Footer />
+      <WhatsAppButton />
     </main>
   );
 }

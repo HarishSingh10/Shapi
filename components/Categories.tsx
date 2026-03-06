@@ -6,29 +6,29 @@ import { motion } from 'framer-motion';
 const collections = [
     {
         title: "Self Defense",
-        image: "/self_defense_placeholder.png", // Updated to a reliable local placeholder
-        link: "#",
+        image: "/self_defense_placeholder.png",
+        link: "/collections/women-safety",
         tag: "ESSENTIAL TOOLS FOR SAFETY",
         count: "12+ Products"
     },
     {
         title: "Automotive Care",
         image: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=1974&auto=format&fit=crop",
-        link: "#",
+        link: "/collections/automotive",
         tag: "PREMIUM VEHICLE SOLUTIONS",
         count: "25+ Products"
     },
     {
         title: "Home Care",
         image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070&auto=format&fit=crop",
-        link: "#",
+        link: "/collections/home-care",
         tag: "KEEP YOUR HOME PRISTINE",
         count: "18+ Products"
     },
     {
         title: "Men's Grooming",
         image: "https://images.unsplash.com/photo-1621600411688-4be93cd68504?q=80&w=2000&auto=format&fit=crop",
-        link: "#",
+        link: "/collections/mens-grooming",
         tag: "PREMIUM PERSONAL CARE",
         count: "15+ Products"
     }

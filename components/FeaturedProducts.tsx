@@ -1,14 +1,15 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { ShoppingCart, Star } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { useState, useRef } from 'react';
-import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
+import { motion, useMotionValue } from 'framer-motion';
+import Link from 'next/link';
 
 const products = [
     {
         name: "Sapi's Premium Upholstery Cleaner",
         price: "₹499",
+        slug: "upholstery-cleaner",
         category: "Home Care",
         image: "https://images.unsplash.com/photo-1585232004423-244e0e6904e3?q=80&w=2070&auto=format&fit=crop",
         tag: "Best Seller"
@@ -16,6 +17,7 @@ const products = [
     {
         name: "Gazotronics 120W Car Charger",
         price: "₹1,299",
+        slug: "car-charger-120w",
         category: "Automotive",
         image: "/gazotronics_charger.png",
         tag: "Trending"
@@ -23,6 +25,7 @@ const products = [
     {
         name: "Herbal Insect Repellent",
         price: "₹299",
+        slug: "herbal-insect-repellent",
         category: "Home Protection",
         image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1887&auto=format&fit=crop",
         tag: "Essential"
@@ -30,12 +33,14 @@ const products = [
     {
         name: "Organic Floor Cleaner",
         price: "₹349",
+        slug: "organic-floor-cleaner",
         category: "Home Care",
         image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070&auto=format&fit=crop",
     },
     {
         name: "Complete Car Care Kit",
         price: "₹2,499",
+        slug: "car-care-kit",
         category: "Automotive",
         image: "https://images.unsplash.com/photo-1601362840469-51e4d8d58785?q=80&w=2070&auto=format&fit=crop",
         tag: "Bundle"
@@ -43,6 +48,7 @@ const products = [
     {
         name: "Safety Self Defence Spray",
         price: "₹499",
+        slug: "self-defence-spray",
         category: "Women Safety",
         image: "/self_defense_placeholder.png",
         tag: "Must Have"
@@ -88,9 +94,13 @@ function ProductCard({ product, index }: { product: any, index: number }) {
 
                 <div className="mt-auto pt-4 border-t border-gray-800 flex items-center justify-between">
                     <span className="text-xl md:text-2xl font-bold text-[#D4AF37]">{product.price}</span>
-                    <button className="bg-gradient-to-r from-[#D4AF37] to-[#F4CF57] text-black px-4 md:px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:shadow-lg hover:scale-105 transition-all duration-300">
-                        Add cart
-                    </button>
+                    <Link
+                        href={`/products/${product.slug}`}
+                        className="bg-gradient-to-r from-[#D4AF37] to-[#F4CF57] text-black px-4 md:px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center gap-1.5"
+                    >
+                        <ShoppingCart className="w-3.5 h-3.5" />
+                        Add Cart
+                    </Link>
                 </div>
             </div>
         </div>
@@ -129,9 +139,12 @@ export function FeaturedProducts() {
                 </div>
 
                 <div className="text-center mt-16">
-                    <button className="bg-gradient-to-r from-[#D4AF37] to-[#F4CF57] text-black px-10 py-4 rounded-xl text-sm font-bold uppercase tracking-wider hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                    <Link
+                        href="/products"
+                        className="bg-gradient-to-r from-[#D4AF37] to-[#F4CF57] text-black px-10 py-4 rounded-xl text-sm font-bold uppercase tracking-wider hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-block"
+                    >
                         View All Products
-                    </button>
+                    </Link>
                 </div>
             </div>
         </section>
