@@ -19,9 +19,9 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900/40 via-black to-gray-900/40"></div>
 
         {/* Animated Glass Orbs */}
-        <div className="absolute top-20 left-20 w-[500px] h-[500px] bg-[#D4AF37]/15 rounded-full blur-[120px] animate-float"></div>
+        <div className="absolute top-20 left-20 w-[500px] h-[500px] bg-white/8 rounded-full blur-[120px] animate-float"></div>
         <div className="absolute bottom-20 right-20 w-[450px] h-[450px] bg-white/8 rounded-full blur-[100px] animate-float-delayed"></div>
-        <div className="absolute top-1/2 right-1/3 w-[400px] h-[400px] bg-[#F4CF57]/12 rounded-full blur-[130px] animate-pulse-slow"></div>
+        <div className="absolute top-1/2 right-1/3 w-[400px] h-[400px] bg-white/6 rounded-full blur-[130px] animate-pulse-slow"></div>
 
         {/* Glossy Shine Overlay */}
         <div className="absolute inset-0 bg-gradient-to-tl from-transparent via-white/5 to-transparent"></div>
