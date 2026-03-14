@@ -1,86 +1,83 @@
 'use client';
 
-import { ShoppingCart } from 'lucide-react';
-import { useState, useRef } from 'react';
-import { motion, useMotionValue } from 'framer-motion';
+import { ShoppingCart, Sparkles } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
-
-const products = [
-    {
-        name: "Sapi's Premium Upholstery Cleaner",
-        price: "₹499",
-        slug: "upholstery-cleaner",
-        category: "Home Care",
-        image: "https://images.unsplash.com/photo-1585232004423-244e0e6904e3?q=80&w=2070&auto=format&fit=crop",
-        tag: "Best Seller"
-    },
-    {
-        name: "Gazotronics 120W Car Charger",
-        price: "₹1,299",
-        slug: "car-charger-120w",
-        category: "Automotive",
-        image: "/gazotronics_charger.png",
-        tag: "Trending"
-    },
-    {
-        name: "Herbal Insect Repellent",
-        price: "₹299",
-        slug: "herbal-insect-repellent",
-        category: "Home Protection",
-        image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1887&auto=format&fit=crop",
-        tag: "Essential"
-    },
-    {
-        name: "Organic Floor Cleaner",
-        price: "₹349",
-        slug: "organic-floor-cleaner",
-        category: "Home Care",
-        image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070&auto=format&fit=crop",
-    },
-    {
-        name: "Complete Car Care Kit",
-        price: "₹2,499",
-        slug: "car-care-kit",
-        category: "Automotive",
-        image: "https://images.unsplash.com/photo-1601362840469-51e4d8d58785?q=80&w=2070&auto=format&fit=crop",
-        tag: "Bundle"
-    },
-    {
-        name: "Safety Self Defence Spray",
-        price: "₹499",
-        slug: "self-defence-spray",
-        category: "Women Safety",
-        image: "/self_defense_placeholder.png",
-        tag: "Must Have"
-    }
-];
+import { useFestival } from './FestivalContext';
+import { useCart } from './CartContext';
 
 // Individual Card Component to handle independent state
-function ProductCard({ product, index }: { product: any, index: number }) {
-    const mouseX = useMotionValue(0);
-    const mouseY = useMotionValue(0);
+function ProductCard({ product }: { product: any }) {
+    const { activeFestival } = useFestival();
+    const { addToCart } = useCart();
+    
+    // Festival pricing logic
+    const isFestival = activeFestival !== 'none';
+    const displayPrice = isFestival ? Math.floor(product.price * 0.9) : product.price;
 
-    function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
-        const { left, top } = currentTarget.getBoundingClientRect();
-        mouseX.set(clientX - left);
-        mouseY.set(clientY - top);
-    }
+    const handleAddToCart = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        addToCart({
+            id: product._id,
+            name: product.name,
+            price: displayPrice,
+            quantity: 1,
+            image: product.image,
+            slug: product.slug
+        });
+    };
 
     return (
-        <div className="group relative bg-gradient-to-br from-gray-900 to-black rounded-2xl overflow-hidden flex flex-col w-full h-full hover:-translate-y-2 transition-all duration-500 shadow-xl hover:shadow-2xl border border-gray-800">
+        <Link 
+            href={`/products/${product.slug}`}
+            className="group relative bg-gradient-to-br from-gray-900 to-black rounded-2xl overflow-hidden flex flex-col w-full h-full hover:-translate-y-2 transition-all duration-500 shadow-xl hover:shadow-2xl border border-gray-800"
+        >
             {/* Image Container */}
             <div className="relative aspect-square overflow-hidden z-0 bg-black">
-                {product.tag && (
-                    <div className="absolute top-3 left-3 z-20 bg-gradient-to-r from-[#D4AF37] to-[#F4CF57] text-black text-[10px] font-bold px-3 py-1.5 uppercase tracking-wider rounded-lg shadow-lg">
-                        {product.tag}
+                {product.tag || isFestival ? (
+                    <div className="absolute top-3 left-3 z-20 flex flex-col gap-2">
+                        {isFestival && (
+                            <div className="bg-gradient-to-r from-red-600 to-orange-500 text-white text-[10px] font-bold px-3 py-1.5 uppercase tracking-wider rounded-lg shadow-lg flex items-center gap-1">
+                                <Sparkles className="w-3 h-3" /> Festival Sale -10%
+                            </div>
+                        )}
+                        {product.tag && (
+                            <div className="bg-gradient-to-r from-[#D4AF37] to-[#F4CF57] text-black text-[10px] font-bold px-3 py-1.5 uppercase tracking-wider rounded-lg shadow-lg">
+                                {product.tag}
+                            </div>
+                        )}
                     </div>
-                )}
+                ) : null}
 
                 <img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700 ease-out brightness-90 group-hover:brightness-100"
+                    className={`w-full h-full object-cover transition-all duration-700 ease-out ${product.stock <= 0 ? 'grayscale brightness-50' : 'brightness-90 group-hover:brightness-100 group-hover:scale-110'}`}
                 />
+
+                {/* Status Badges */}
+                <div className="absolute top-3 left-3 z-20 flex flex-col gap-2">
+                    {product.stock <= 0 ? (
+                        <div className="bg-red-600 text-white text-[10px] font-bold px-3 py-1.5 uppercase tracking-wider rounded-lg shadow-lg">
+                            Out Of Stock
+                        </div>
+                    ) : (
+                        <>
+                            {isFestival && (
+                                <div className="bg-gradient-to-r from-red-600 to-orange-500 text-white text-[10px] font-bold px-3 py-1.5 uppercase tracking-wider rounded-lg shadow-lg flex items-center gap-1">
+                                    <Sparkles className="w-3 h-3" /> Festival Sale
+                                </div>
+                            )}
+                            {product.tag && (
+                                <div className="bg-gradient-to-r from-[#D4AF37] to-[#F4CF57] text-black text-[10px] font-bold px-3 py-1.5 uppercase tracking-wider rounded-lg shadow-lg">
+                                    {product.tag}
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
 
                 {/* Gradient Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"></div>
@@ -93,48 +90,75 @@ function ProductCard({ product, index }: { product: any, index: number }) {
                 </h3>
 
                 <div className="mt-auto pt-4 border-t border-gray-800 flex items-center justify-between">
-                    <span className="text-xl md:text-2xl font-bold text-[#D4AF37]">{product.price}</span>
-                    <Link
-                        href={`/products/${product.slug}`}
-                        className="bg-gradient-to-r from-[#D4AF37] to-[#F4CF57] text-black px-4 md:px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center gap-1.5"
+                    <div className="flex flex-col">
+                        <span className="text-xl md:text-2xl font-bold text-[#D4AF37]">₹{displayPrice}</span>
+                        {isFestival && (
+                            <span className="text-xs text-gray-500 line-through">₹{product.price}</span>
+                        )}
+                    </div>
+                    <button 
+                        onClick={handleAddToCart}
+                        disabled={product.stock <= 0}
+                        className={`bg-gradient-to-r from-[#D4AF37] to-[#F4CF57] text-black px-4 md:px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center gap-1.5 ${product.stock <= 0 ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
                     >
                         <ShoppingCart className="w-3.5 h-3.5" />
-                        Add Cart
-                    </Link>
+                        {product.stock <= 0 ? 'Sold Out' : 'Add Cart'}
+                    </button>
                 </div>
             </div>
-        </div>
-    )
+        </Link>
+    );
 }
 
 export function FeaturedProducts() {
+    const [products, setProducts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch('/api/products')
+            .then(res => res.json())
+            .then(data => {
+                setProducts(Array.isArray(data) ? data : []);
+                setLoading(false);
+            });
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="py-20 text-center text-[#D4AF37] font-bold tracking-widest bg-black animate-pulse">
+                SYNCING WITH PREMIUM VAULT...
+            </div>
+        );
+    }
+
+    if (products.length === 0) {
+        return (
+            <div className="py-20 text-center text-gray-500 bg-black">
+                <p className="uppercase tracking-widest text-xs">No products currently in inventory.</p>
+            </div>
+        );
+    }
+
+    const displayProducts = products.slice(0, 4);
+
     return (
         <section className="py-20 relative overflow-hidden bg-black">
-            {/* Glassmorphism Effects */}
+            {/* Background elements */}
             <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900/50 to-black"></div>
-
-            {/* Animated Glass Orbs */}
             <div className="absolute top-32 left-32 w-[550px] h-[550px] bg-[#D4AF37]/12 rounded-full blur-[130px] animate-float"></div>
             <div className="absolute bottom-32 right-32 w-[450px] h-[450px] bg-white/6 rounded-full blur-[110px] animate-float-delayed"></div>
-            <div className="absolute top-1/3 right-1/4 w-[380px] h-[380px] bg-[#F4CF57]/10 rounded-full blur-[140px] animate-pulse-slow"></div>
-
-            {/* Glossy Shine Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-bl from-transparent via-white/5 to-transparent"></div>
-
-            {/* Subtle Grid Pattern */}
-            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjAyIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
-
+            
             <div className="container-custom mx-auto px-6 relative z-10">
                 <div className="mb-12">
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-2 uppercase tracking-tight drop-shadow-2xl">
+                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-2 uppercase tracking-tight">
                         FEATURED PRODUCTS
                     </h2>
-                    <p className="text-gray-400 text-sm md:text-base mt-2">Discover our premium selection of automotive and lifestyle products</p>
+                    <p className="text-gray-400 text-sm md:text-base mt-2">Discover our premium selection directly from our inventory.</p>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {products.map((product, index) => (
-                        <ProductCard key={index} product={product} index={index} />
+                    {displayProducts.map((product, index) => (
+                        <ProductCard key={index} product={product} />
                     ))}
                 </div>
 

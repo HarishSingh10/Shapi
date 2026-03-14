@@ -22,6 +22,10 @@ export const metadata: Metadata = {
   description: "Experience the gold standard in automotive and home care solutions.",
 };
 
+import { FestivalProvider } from "@/components/FestivalContext";
+import { FestivalEffects } from "@/components/FestivalEffects";
+import { CartProvider } from "@/components/CartContext";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -32,7 +36,12 @@ export default function RootLayout({
       <body
         className={`${oswald.variable} ${montserrat.variable} ${playfair.variable} antialiased bg-black text-white`}
       >
-        {children}
+        <FestivalProvider>
+          <CartProvider>
+            <FestivalEffects />
+            {children}
+          </CartProvider>
+        </FestivalProvider>
       </body>
     </html>
   );

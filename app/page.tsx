@@ -44,13 +44,13 @@ export default function Home() {
             </p>
 
             {/* Email Form */}
-            <div className="flex flex-col sm:flex-row gap-0 max-w-2xl mx-auto">
+            <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
               <input
                 type="email"
                 placeholder="Enter your email address"
-                className="flex-1 px-8 py-5 bg-white/5 backdrop-blur-md border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] focus:bg-white/10 transition-all text-sm"
+                className="flex-1 px-8 py-5 bg-white/5 backdrop-blur-md border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] focus:bg-white/10 transition-all text-sm rounded-xl"
               />
-              <button className="bg-gradient-to-r from-[#D4AF37] to-[#F4CF57] px-10 py-5 text-black font-bold uppercase tracking-[0.2em] text-xs hover:shadow-[0_0_30px_rgba(212,175,55,0.6)] hover:scale-[1.02] transition-all duration-300">
+              <button className="bg-gradient-to-r from-[#D4AF37] to-[#F4CF57] px-10 py-5 text-black font-bold uppercase tracking-[0.2em] text-xs hover:shadow-[0_0_30px_rgba(212,175,55,0.6)] hover:scale-[1.02] transition-all duration-300 rounded-xl">
                 SUBSCRIBE
               </button>
             </div>

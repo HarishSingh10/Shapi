@@ -1,72 +1,81 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Minus, Plus, ShoppingCart, Zap, Truck, Shield, ChevronRight } from 'lucide-react';
+import { Minus, Plus, ShoppingCart, Zap, Truck, Shield, ChevronRight, Sparkles } from 'lucide-react';
 import Link from 'next/link';
-
-// Demo product data
-const productsData: Record<string, any> = {
-    'upholstery-cleaner': {
-        name: "Sapi's Premium Upholstery Cleaner",
-        price: 499, originalPrice: 999,
-        images: ["https://images.unsplash.com/photo-1585232004423-244e0e6904e3?q=80&w=800&auto=format&fit=crop"],
-        category: "Home Care",
-        description: "Professional-grade upholstery cleaner that removes tough stains, odours, and grime from all fabric surfaces. Safe for use on sofas, chairs, car seats, and more.",
-        features: ["Deep cleaning formula", "Safe for all fabrics", "Pleasant fragrance", "500ml bottle"],
-    },
-    'car-charger-120w': {
-        name: "Gazotronics 120W Car Charger",
-        price: 1299, originalPrice: 2499,
-        images: ["/gazotronics_charger.png"],
-        category: "Automotive",
-        description: "Ultra-fast 120W car charger with 4-in-1 compatibility. Charges all devices at maximum speed with intelligent power distribution technology.",
-        features: ["120W fast charging", "4-in-1 cable", "LED display", "Universal compatibility"],
-    },
-    'car-care-kit': {
-        name: "Complete Car Care Kit",
-        price: 2499, originalPrice: 4999,
-        images: ["https://images.unsplash.com/photo-1601362840469-51e4d8d58785?q=80&w=800&auto=format&fit=crop"],
-        category: "Automotive",
-        description: "Everything you need to keep your car looking showroom-new. Includes ceramic wax, interior cleaner, dashboard polish, microfiber towels, and more.",
-        features: ["7 products included", "Premium microfiber towels", "Ceramic protection", "Complete care solution"],
-    },
-};
-
-// Fallback for any slug not in our data
-const defaultProduct = {
-    name: "Premium Product",
-    price: 999, originalPrice: 1999,
-    images: ["https://images.unsplash.com/photo-1601362840469-51e4d8d58785?q=80&w=800&auto=format&fit=crop"],
-    category: "Automotive",
-    description: "A premium quality product from Sapi's Crafterina. Designed for excellence and built to last with the finest materials.",
-    features: ["Premium quality", "Long lasting", "Easy to use", "Satisfaction guaranteed"],
-};
+import { useFestival } from './FestivalContext';
+import { useCart } from './CartContext';
 
 export function ProductDetail() {
     const params = useParams();
     const slug = params?.slug as string;
-    const product = productsData[slug] || defaultProduct;
+    const { activeFestival } = useFestival();
+    const { addToCart } = useCart();
+    
+    const [product, setProduct] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [pincode, setPincode] = useState('');
     const [pincodeResult, setPincodeResult] = useState('');
 
-    const discount = Math.round((1 - product.price / product.originalPrice) * 100);
-
-    const checkPincode = () => {
-        if (pincode.length === 6) {
-            setPincodeResult(`Delivery available to ${pincode}. Estimated delivery: 3-5 business days.`);
-        } else {
-            setPincodeResult('Please enter a valid 6-digit pincode.');
+    useEffect(() => {
+        if (slug) {
+            fetch(`/api/products/${slug}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.error) setProduct(data);
+                    setLoading(false);
+                })
+                .catch(err => {
+                    console.error('Fetch error:', err);
+                    setLoading(false);
+                });
         }
+    }, [slug]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center">
+                <div className="text-[#D4AF37] font-bold tracking-[0.3em] animate-pulse uppercase">Searching our vault...</div>
+            </div>
+        );
+    }
+
+    if (!product) {
+        return (
+            <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6 text-center">
+                <h1 className="text-4xl font-serif mb-4 text-white">Selection Not Found</h1>
+                <p className="text-gray-500 mb-8 max-w-md">Our apologies. The item you're looking for might have moved or is currently out of stock.</p>
+                <Link href="/products" className="bg-[#D4AF37] text-black px-10 py-4 font-bold uppercase tracking-widest hover:bg-white transition-all">Back to Collection</Link>
+            </div>
+        );
+    }
+
+    // Festival pricing logic
+    const isFestival = activeFestival !== 'none';
+    const basePrice = product.price;
+    const currentPrice = isFestival ? Math.floor(basePrice * 0.9) : basePrice;
+    const displayOriginalPrice = isFestival ? basePrice : product.originalPrice;
+    const discount = Math.round((1 - currentPrice / displayOriginalPrice) * 100);
+
+    const handleAddToCart = () => {
+        addToCart({
+            id: product._id,
+            name: product.name,
+            price: currentPrice,
+            quantity: quantity,
+            image: product.image,
+            slug: product.slug
+        });
     };
 
     return (
-        <section className="pt-32 pb-20 bg-black">
+        <section className="pt-32 pb-20 bg-black min-h-screen">
             <div className="container-custom mx-auto px-6">
                 {/* Breadcrumb */}
-                <nav className="flex items-center gap-2 text-xs text-white/40 mb-8">
+                <nav className="flex items-center gap-2 text-[10px] md:text-xs text-white/40 mb-8 uppercase tracking-widest">
                     <Link href="/" className="hover:text-[#D4AF37] transition-colors">Home</Link>
                     <ChevronRight className="w-3 h-3" />
                     <Link href="/products" className="hover:text-[#D4AF37] transition-colors">Products</Link>
@@ -77,18 +86,32 @@ export function ProductDetail() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
                     {/* Product Image */}
                     <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="relative aspect-square bg-gray-900 overflow-hidden group"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="relative aspect-square bg-white/5 overflow-hidden group rounded-2xl border border-white/5"
                     >
                         <img
-                            src={product.images[0]}
+                            src={product.image}
                             alt={product.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
                         />
-                        {/* Sale Badge */}
-                        <div className="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1.5">
-                            Save {discount}%
+                        {/* Status Badges */}
+                        <div className="absolute top-4 left-4 flex flex-col gap-2">
+                            {isFestival && (
+                                <div className="bg-gradient-to-r from-red-600 to-orange-500 text-white text-[10px] font-bold px-3 py-1.5 uppercase tracking-wider rounded-lg shadow-xl flex items-center gap-1.5">
+                                    <Sparkles className="w-3 h-3" /> Festival Offer
+                                </div>
+                            )}
+                            {discount > 0 && (
+                                <div className="bg-white text-black text-[10px] font-bold px-3 py-1.5 uppercase tracking-wider rounded-lg shadow-xl">
+                                    Save {discount}%
+                                </div>
+                            )}
+                            {product.stock <= 0 && (
+                                <div className="bg-red-600 text-white text-[10px] font-bold px-3 py-1.5 uppercase tracking-wider rounded-lg shadow-xl border border-red-500/50">
+                                    Out Of Stock
+                                </div>
+                            )}
                         </div>
                     </motion.div>
 
@@ -98,107 +121,109 @@ export function ProductDetail() {
                         animate={{ opacity: 1, x: 0 }}
                         className="flex flex-col"
                     >
-                        <span className="text-[#D4AF37] text-xs uppercase tracking-[0.3em] font-semibold mb-3">
+                        <span className="text-[#D4AF37] text-xs uppercase tracking-[0.4em] font-bold mb-4">
                             {product.category}
                         </span>
 
-                        <h1 className="font-serif text-3xl md:text-4xl text-white font-normal mb-6 leading-tight">
+                        <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 uppercase tracking-tight leading-tight">
                             {product.name}
                         </h1>
 
                         {/* Pricing */}
-                        <div className="flex items-center gap-4 mb-6">
-                            <span className="text-3xl font-bold text-[#D4AF37]">₹{product.price.toLocaleString()}</span>
-                            <span className="text-lg text-white/30 line-through">₹{product.originalPrice.toLocaleString()}</span>
-                            <span className="bg-red-600/20 text-red-400 text-xs font-bold px-3 py-1 rounded">
-                                {discount}% OFF
-                            </span>
+                        <div className="flex items-end gap-4 mb-8">
+                            <div className="flex flex-col">
+                                {isFestival && (
+                                    <span className="text-xs text-red-500 font-bold mb-1 uppercase tracking-wider">Special Festival Price</span>
+                                )}
+                                <span className="text-4xl md:text-5xl font-bold text-[#D4AF37]">₹{currentPrice.toLocaleString()}</span>
+                            </div>
+                            <div className="flex flex-col mb-1">
+                                <span className="text-lg text-white/20 line-through">₹{displayOriginalPrice.toLocaleString()}</span>
+                                <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest italic">Incl. all taxes</span>
+                            </div>
                         </div>
 
-                        <p className="text-white/60 text-sm leading-relaxed mb-8">
+                        <div className="h-px w-full bg-white/10 mb-8"></div>
+
+                        <p className="text-gray-400 text-sm md:text-base leading-relaxed mb-8 font-light">
                             {product.description}
                         </p>
 
                         {/* Features */}
-                        <ul className="space-y-2 mb-8">
-                            {product.features.map((f: string, i: number) => (
-                                <li key={i} className="flex items-center gap-3 text-white/70 text-sm">
-                                    <div className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full"></div>
+                        <div className="grid grid-cols-2 gap-4 mb-10">
+                            {product.features?.map((f: string, i: number) => (
+                                <div key={i} className="flex items-center gap-3 text-white/70 text-xs md:text-sm">
+                                    <div className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full shadow-[0_0_8px_rgba(212,175,55,0.8)]"></div>
                                     {f}
-                                </li>
+                                </div>
                             ))}
-                        </ul>
+                        </div>
 
-                        {/* Quantity */}
-                        <div className="flex items-center gap-6 mb-8">
-                            <span className="text-white/50 text-xs uppercase tracking-wider">Quantity</span>
-                            <div className="flex items-center border border-white/10">
-                                <button
-                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                    className="p-3 hover:bg-white/5 transition-colors"
-                                >
-                                    <Minus className="w-4 h-4 text-white/60" />
-                                </button>
-                                <span className="px-6 text-white font-medium">{quantity}</span>
-                                <button
-                                    onClick={() => setQuantity(quantity + 1)}
-                                    className="p-3 hover:bg-white/5 transition-colors"
-                                >
-                                    <Plus className="w-4 h-4 text-white/60" />
-                                </button>
+                        {/* Quantity & Action */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-6">
+                                <span className="text-white/40 text-[10px] uppercase tracking-widest font-bold">Quantity</span>
+                                <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+                                    <button
+                                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                        className="p-4 hover:bg-white/10 transition-colors text-white/60"
+                                        disabled={product.stock <= 0}
+                                    >
+                                        <Minus className="w-4 h-4" />
+                                    </button>
+                                    <span className={`w-12 text-center text-white font-bold ${product.stock <= 0 ? 'opacity-20' : ''}`}>{quantity}</span>
+                                    <button
+                                        onClick={() => setQuantity(quantity + 1)}
+                                        className="p-4 hover:bg-white/10 transition-colors text-white/60"
+                                        disabled={product.stock <= 0}
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                    </button>
+                                </div>
+                                {product.stock > 0 && product.stock <= 5 && (
+                                    <span className="text-[10px] font-black text-red-500 uppercase animate-pulse">Only {product.stock} Left in Stock!</span>
+                                )}
                             </div>
-                        </div>
 
-                        {/* CTA Buttons */}
-                        <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                            <button className="flex-1 flex items-center justify-center gap-3 bg-white/5 border border-white/10 text-white py-4 px-6 uppercase tracking-wider text-sm font-semibold hover:border-[#D4AF37] hover:text-[#D4AF37] transition-all duration-300">
-                                <ShoppingCart className="w-5 h-5" />
-                                Add to Cart
-                            </button>
-                            <button className="flex-1 flex items-center justify-center gap-3 bg-gradient-to-r from-[#D4AF37] to-[#F4CF57] text-black py-4 px-6 uppercase tracking-wider text-sm font-bold hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] transition-all duration-300">
-                                <Zap className="w-5 h-5" />
-                                Buy it Now
-                            </button>
-                        </div>
-
-                        {/* Pincode Checker */}
-                        <div className="border-t border-white/10 pt-6 mb-6">
-                            <p className="text-white/50 text-xs uppercase tracking-wider mb-3 flex items-center gap-2">
-                                <Truck className="w-4 h-4 text-[#D4AF37]" />
-                                Check Delivery Availability
-                            </p>
-                            <div className="flex gap-0">
-                                <input
-                                    type="text"
-                                    value={pincode}
-                                    onChange={(e) => setPincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                    placeholder="Enter Pincode"
-                                    className="flex-1 bg-white/5 border border-white/10 text-white px-4 py-3 text-sm focus:outline-none focus:border-[#D4AF37] transition-all placeholder:text-white/30"
-                                />
-                                <button
-                                    onClick={checkPincode}
-                                    className="px-6 py-3 bg-[#D4AF37] text-black font-bold text-xs uppercase tracking-wider hover:bg-[#F4CF57] transition-colors"
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <button 
+                                    onClick={handleAddToCart}
+                                    disabled={product.stock <= 0}
+                                    className={`flex-1 group relative overflow-hidden bg-white/5 border border-white/10 text-white py-5 px-8 uppercase tracking-[0.2em] text-[10px] font-bold hover:border-white transition-all duration-500 rounded-xl ${product.stock <= 0 ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
                                 >
-                                    Check
-                                </button>
-                            </div>
-                            {pincodeResult && (
-                                <p className="text-sm mt-3 text-green-400">{pincodeResult}</p>
-                            )}
-                        </div>
-
-                        {/* Payment Methods */}
-                        <div className="border-t border-white/10 pt-6">
-                            <p className="text-white/50 text-xs uppercase tracking-wider mb-3 flex items-center gap-2">
-                                <Shield className="w-4 h-4 text-[#D4AF37]" />
-                                Secure Payment Methods
-                            </p>
-                            <div className="flex items-center gap-3 flex-wrap">
-                                {['Visa', 'Mastercard', 'RuPay', 'UPI', 'PhonePe', 'GPay', 'Paytm'].map((method) => (
-                                    <span key={method} className="bg-white/5 border border-white/10 text-white/60 text-[10px] px-3 py-1.5 font-medium uppercase tracking-wide">
-                                        {method}
+                                    <span className="relative z-10 flex items-center justify-center gap-3">
+                                        <ShoppingCart className="w-4 h-4" /> {product.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
                                     </span>
-                                ))}
+                                </button>
+                                <button 
+                                    onClick={handleAddToCart}
+                                    disabled={product.stock <= 0}
+                                    className={`flex-2 bg-gradient-to-r from-[#D4AF37] to-[#F4CF57] text-black py-5 px-12 uppercase tracking-[0.2em] text-[10px] font-black hover:shadow-[0_0_40px_rgba(212,175,55,0.5)] transition-all duration-500 rounded-xl flex items-center justify-center gap-3 ${product.stock <= 0 ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+                                >
+                                    <Zap className="w-4 h-4 fill-black" /> {product.stock <= 0 ? 'Notify Me' : 'Buy it Now'}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Additional Info */}
+                        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 pt-10 border-t border-white/5">
+                            <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0">
+                                    <Truck className="w-5 h-5 text-[#D4AF37]" />
+                                </div>
+                                <div>
+                                    <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-1">Express Delivery</h4>
+                                    <p className="text-[10px] text-gray-500 uppercase tracking-wide">3-5 Business Days</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0">
+                                    <Shield className="w-5 h-5 text-[#D4AF37]" />
+                                </div>
+                                <div>
+                                    <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-1">Quality Guaranteed</h4>
+                                    <p className="text-[10px] text-gray-500 uppercase tracking-wide">100% Authentic Products</p>
+                                </div>
                             </div>
                         </div>
                     </motion.div>

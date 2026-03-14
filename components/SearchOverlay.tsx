@@ -5,33 +5,22 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
-// Sample products data for search (will be replaced with real data later)
-const allProducts = [
-    { name: "Sapi's Premium Upholstery Cleaner", price: "₹499", slug: "upholstery-cleaner", category: "Home Care" },
-    { name: "Gazotronics 120W Car Charger", price: "₹1,299", slug: "car-charger-120w", category: "Automotive" },
-    { name: "Herbal Insect Repellent", price: "₹299", slug: "herbal-insect-repellent", category: "Home Protection" },
-    { name: "Organic Floor Cleaner", price: "₹349", slug: "organic-floor-cleaner", category: "Home Care" },
-    { name: "Complete Car Care Kit", price: "₹2,499", slug: "car-care-kit", category: "Automotive" },
-    { name: "Safety Self Defence Spray", price: "₹499", slug: "self-defence-spray", category: "Women Safety" },
-    { name: "Nano Ceramic Wax", price: "₹1,499", slug: "nano-ceramic-wax", category: "Automotive" },
-    { name: "Microfiber Kit", price: "₹899", slug: "microfiber-kit", category: "Automotive" },
-    { name: "Interior Cleaner", price: "₹699", slug: "interior-cleaner", category: "Automotive" },
-    { name: "Engine Degreaser", price: "₹599", slug: "engine-degreaser", category: "Automotive" },
-    { name: "Motor Pro Chain Lube", price: "₹399", slug: "chain-lube", category: "Automotive" },
-    { name: "Detail Spray Wash & Shine", price: "₹449", slug: "detail-spray", category: "Automotive" },
-    { name: "Carpet & Upholstery Cleaner", price: "₹549", slug: "carpet-cleaner", category: "Home Care" },
-    { name: "Glass Cleaner Premium", price: "₹299", slug: "glass-cleaner", category: "Home Care" },
-    { name: "Men's Grooming Kit", price: "₹1,199", slug: "mens-grooming-kit", category: "Men's Grooming" },
-    { name: "Pepper Spray Safety Kit", price: "₹799", slug: "pepper-spray-kit", category: "Women Safety" },
-];
-
 export function SearchOverlay({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
     const [query, setQuery] = useState('');
+    const [products, setProducts] = useState<any[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (isOpen && inputRef.current) {
-            setTimeout(() => inputRef.current?.focus(), 200);
+        if (isOpen) {
+            // Pre-fetch products for search when overlay opens
+            fetch('/api/products')
+                .then(res => res.json())
+                .then(data => setProducts(Array.isArray(data) ? data : []))
+                .catch(err => console.error('Failed to fetch products for search:', err));
+            
+            if (inputRef.current) {
+                setTimeout(() => inputRef.current?.focus(), 200);
+            }
         }
         if (!isOpen) setQuery('');
     }, [isOpen]);
@@ -46,7 +35,7 @@ export function SearchOverlay({ isOpen, onClose }: { isOpen: boolean; onClose: (
     }, [onClose]);
 
     const filteredProducts = query.trim().length > 0
-        ? allProducts.filter(p =>
+        ? products.filter(p =>
             p.name.toLowerCase().includes(query.toLowerCase()) ||
             p.category.toLowerCase().includes(query.toLowerCase())
         )
@@ -101,20 +90,27 @@ export function SearchOverlay({ isOpen, onClose }: { isOpen: boolean; onClose: (
                                                     key={i}
                                                     href={`/products/${product.slug}`}
                                                     onClick={onClose}
-                                                    className="flex items-center justify-between p-4 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-[#D4AF37]/30 transition-all duration-300 group"
+                                                    className="flex items-center justify-between p-4 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-[#D4AF37]/30 transition-all duration-300 group rounded-xl"
                                                 >
-                                                    <div>
-                                                        <h4 className="text-white font-medium group-hover:text-[#D4AF37] transition-colors">
-                                                            {product.name}
-                                                        </h4>
-                                                        <span className="text-white/40 text-xs uppercase tracking-wide">{product.category}</span>
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-12 h-12 bg-gray-900 rounded-lg overflow-hidden shrink-0 border border-white/10">
+                                                            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                                                        </div>
+                                                        <div>
+                                                            <h4 className="text-white font-medium group-hover:text-[#D4AF37] transition-colors line-clamp-1">
+                                                                {product.name}
+                                                            </h4>
+                                                            <span className="text-white/40 text-[10px] uppercase tracking-wider">{product.category}</span>
+                                                        </div>
                                                     </div>
-                                                    <span className="text-[#D4AF37] font-semibold">{product.price}</span>
+                                                    <span className="text-[#D4AF37] font-semibold">₹{product.price.toLocaleString()}</span>
                                                 </Link>
                                             ))}
                                         </div>
                                     ) : (
-                                        <p className="text-white/40 text-center py-8">No products found for &ldquo;{query}&rdquo;</p>
+                                        <div className="py-20 text-center border border-white/5 rounded-3xl bg-white/5">
+                                            <p className="text-white/40 uppercase tracking-[0.2em] text-sm">No products found for &ldquo;{query}&rdquo;</p>
+                                        </div>
                                     )}
                                 </motion.div>
                             )}

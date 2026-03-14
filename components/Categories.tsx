@@ -1,40 +1,54 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
-const collections = [
+const initialCollections = [
     {
         title: "Self Defense",
+        slug: "self-defense",
         image: "/self_defense_placeholder.png",
-        link: "/collections/women-safety",
         tag: "ESSENTIAL TOOLS FOR SAFETY",
-        count: "12+ Products"
     },
     {
         title: "Automotive Care",
+        slug: "automotive",
         image: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=1974&auto=format&fit=crop",
-        link: "/collections/automotive",
         tag: "PREMIUM VEHICLE SOLUTIONS",
-        count: "25+ Products"
     },
     {
         title: "Home Care",
+        slug: "home-care",
         image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070&auto=format&fit=crop",
-        link: "/collections/home-care",
         tag: "KEEP YOUR HOME PRISTINE",
-        count: "18+ Products"
     },
     {
         title: "Men's Grooming",
+        slug: "mens-grooming",
         image: "https://images.unsplash.com/photo-1621600411688-4be93cd68504?q=80&w=2000&auto=format&fit=crop",
-        link: "/collections/mens-grooming",
         tag: "PREMIUM PERSONAL CARE",
-        count: "15+ Products"
     }
 ];
 
 export function Categories() {
+    const [counts, setCounts] = useState<Record<string, number>>({});
+
+    useEffect(() => {
+        fetch('/api/products')
+            .then(res => res.json())
+            .then(data => {
+                const products = Array.isArray(data) ? data : [];
+                const newCounts: Record<string, number> = {};
+                products.forEach(p => {
+                    const cat = p.category?.toLowerCase();
+                    if (cat) newCounts[cat] = (newCounts[cat] || 0) + 1;
+                });
+                setCounts(newCounts);
+            })
+            .catch(err => console.error('Failed to fetch counts:', err));
+    }, []);
+
     return (
         <section id="collections" className="py-20 relative overflow-hidden bg-black">
             {/* Glassmorphism Effects */}
@@ -57,38 +71,44 @@ export function Categories() {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {collections.map((collection, index) => (
-                        <Link key={index} href={collection.link} className="group relative block rounded-3xl overflow-hidden hover:-translate-y-2 transition-all duration-500 shadow-lg hover:shadow-2xl">
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: index * 0.1, duration: 0.5 }}
-                                className="w-full aspect-[3/4] relative bg-gradient-to-br from-gray-900 to-black"
-                            >
-                                <img
-                                    src={collection.image}
-                                    alt={collection.title}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 brightness-[0.75] group-hover:brightness-[0.9]"
-                                />
+                    {initialCollections.map((collection, index) => {
+                        const count = counts[collection.slug] || 0;
+                        return (
+                            <Link key={index} href={`/collections/${collection.slug}`} className="group relative block rounded-3xl overflow-hidden hover:-translate-y-2 transition-all duration-500 shadow-lg hover:shadow-2xl">
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: index * 0.1, duration: 0.5 }}
+                                    className="w-full aspect-[3/4] relative bg-gradient-to-br from-gray-900 to-black"
+                                >
+                                    <img
+                                        src={collection.image}
+                                        alt={collection.title}
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 brightness-[0.75] group-hover:brightness-[0.9]"
+                                    />
 
-                                {/* Gradient Overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/90" />
+                                    {/* Gradient Overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/90" />
 
-                                {/* Content */}
-                                <div className="absolute bottom-0 left-0 right-0 p-6">
-                                    <div className="bg-gradient-to-r from-[#D4AF37] to-[#F4CF57] p-4 rounded-xl transform group-hover:scale-105 transition-transform duration-300 shadow-lg">
-                                        <h3 className="text-base md:text-lg font-bold text-black uppercase tracking-wide text-center">
-                                            {collection.title}
-                                        </h3>
+                                    {/* Content */}
+                                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                                        <div className="bg-gradient-to-r from-[#D4AF37] to-[#F4CF57] p-4 rounded-xl transform group-hover:scale-105 transition-transform duration-300 shadow-lg">
+                                            <h3 className="text-base md:text-lg font-bold text-black uppercase tracking-wide text-center">
+                                                {collection.title}
+                                            </h3>
+                                            <p className="text-[10px] text-black/60 font-bold uppercase tracking-widest text-center mt-1">
+                                                {count} {count === 1 ? 'Product' : 'Products'}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
 
-                                {/* Hover Effect Border */}
-                                <div className="absolute inset-0 border-4 border-transparent group-hover:border-[#D4AF37] rounded-3xl transition-all duration-300"></div>
-                            </motion.div>
-                        </Link>
-                    ))}
+                                    {/* Hover Effect Border */}
+                                    <div className="absolute inset-0 border-4 border-transparent group-hover:border-[#D4AF37] rounded-3xl transition-all duration-300"></div>
+                                </motion.div>
+                            </Link>
+                        );
+                    })}
                 </div>
             </div>
         </section>
